@@ -17,41 +17,44 @@ namespace RSASystem
         /// <returns></returns>
         public static RSA CreateRsaProviderFromPrivateKey(byte[] privateKeyByte)
         {
-            var rsa = RSA.Create();
-            var rsaParameters = new RSAParameters();
-
-            using (BinaryReader binr = new BinaryReader(new MemoryStream(privateKeyByte)))
+            using (var rsa = RSA.Create())
             {
-                byte bt = 0;
-                ushort twobytes = 0;
-                twobytes = binr.ReadUInt16();
-                if (twobytes == 0x8130)
-                    binr.ReadByte();
-                else if (twobytes == 0x8230)
-                    binr.ReadInt16();
-                else
-                    throw new Exception("Unexpected value read binr.ReadUInt16()");
+                var rsaParameters = new RSAParameters();
 
-                twobytes = binr.ReadUInt16();
-                if (twobytes != 0x0102)
-                    throw new Exception("Unexpected version");
+                using (BinaryReader binr = new BinaryReader(new MemoryStream(privateKeyByte)))
+                {
+                    byte bt = 0;
+                    ushort twobytes = 0;
+                    twobytes = binr.ReadUInt16();
+                    if (twobytes == 0x8130)
+                        binr.ReadByte();
+                    else if (twobytes == 0x8230)
+                        binr.ReadInt16();
+                    else
+                        throw new Exception("Unexpected value read binr.ReadUInt16()");
 
-                bt = binr.ReadByte();
-                if (bt != 0x00)
-                    throw new Exception("Unexpected value read binr.ReadByte()");
+                    twobytes = binr.ReadUInt16();
+                    if (twobytes != 0x0102)
+                        throw new Exception("Unexpected version");
 
-                rsaParameters.Modulus = binr.ReadBytes(SecretAlg.GetIntegerSize(binr));
-                rsaParameters.Exponent = binr.ReadBytes(SecretAlg.GetIntegerSize(binr));
-                rsaParameters.D = binr.ReadBytes(SecretAlg.GetIntegerSize(binr));
-                rsaParameters.P = binr.ReadBytes(SecretAlg.GetIntegerSize(binr));
-                rsaParameters.Q = binr.ReadBytes(SecretAlg.GetIntegerSize(binr));
-                rsaParameters.DP = binr.ReadBytes(SecretAlg.GetIntegerSize(binr));
-                rsaParameters.DQ = binr.ReadBytes(SecretAlg.GetIntegerSize(binr));
-                rsaParameters.InverseQ = binr.ReadBytes(SecretAlg.GetIntegerSize(binr));
+                    bt = binr.ReadByte();
+                    if (bt != 0x00)
+                        throw new Exception("Unexpected value read binr.ReadByte()");
+
+                    rsaParameters.Modulus = binr.ReadBytes(SecretAlg.GetIntegerSize(binr));
+                    rsaParameters.Exponent = binr.ReadBytes(SecretAlg.GetIntegerSize(binr));
+                    rsaParameters.D = binr.ReadBytes(SecretAlg.GetIntegerSize(binr));
+                    rsaParameters.P = binr.ReadBytes(SecretAlg.GetIntegerSize(binr));
+                    rsaParameters.Q = binr.ReadBytes(SecretAlg.GetIntegerSize(binr));
+                    rsaParameters.DP = binr.ReadBytes(SecretAlg.GetIntegerSize(binr));
+                    rsaParameters.DQ = binr.ReadBytes(SecretAlg.GetIntegerSize(binr));
+                    rsaParameters.InverseQ = binr.ReadBytes(SecretAlg.GetIntegerSize(binr));
+                }
+
+                rsa.ImportParameters(rsaParameters);
+                return rsa;
             }
 
-            rsa.ImportParameters(rsaParameters);
-            return rsa;
         }
 
         #endregion
@@ -140,15 +143,18 @@ namespace RSASystem
                     byte[] exponent = binr.ReadBytes(expbytes);
 
                     // ------- create RSACryptoServiceProvider instance and initialize with public key -----
-                    var rsa = RSA.Create();
-                    RSAParameters rsaKeyInfo = new RSAParameters
-                    {
-                        Modulus = modulus,
-                        Exponent = exponent
-                    };
-                    rsa.ImportParameters(rsaKeyInfo);
 
-                    return rsa;
+                    using (var rsa = RSA.Create())
+                    {
+                        RSAParameters rsaKeyInfo = new RSAParameters
+                        {
+                            Modulus = modulus,
+                            Exponent = exponent
+                        };
+                        rsa.ImportParameters(rsaKeyInfo);
+
+                        return rsa;
+                    }
                 }
 
             }

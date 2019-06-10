@@ -13,10 +13,10 @@ namespace RSASystem
 	/// 时间：2019年6月6日
     /// 作者:lijinlong
 	/// </summary>
-    public class RSASystemHelper
+    public class RSASystemHelper : IDisposable
     {
-        private readonly RSA _privateKeyRsaProvider;
-        private readonly RSA _publicKeyRsaProvider;
+        private RSA _privateKeyRsaProvider;
+        private RSA _publicKeyRsaProvider;
         private readonly HashAlgorithmName _hashAlgorithmName;
         private readonly Encoding _encoding;
         private readonly bool IsBase64;
@@ -136,7 +136,7 @@ namespace RSASystem
             {
                 throw new ArgumentNullException("_publicKeyRsaProvider is null");
             }
-            byte[] textBits= _publicKeyRsaProvider.Encrypt(_encoding.GetBytes(text), RSAEncryptionPadding.Pkcs1);
+            byte[] textBits = _publicKeyRsaProvider.Encrypt(_encoding.GetBytes(text), RSAEncryptionPadding.Pkcs1);
             if (IsBase64)
                 return Convert.ToBase64String(textBits);
             else
@@ -181,8 +181,37 @@ namespace RSASystem
             }
             return CreateRsaProvider.CreateRsaProviderFromPublicKey(x509Key);
         }
-
         #endregion
 
+        #region 垃圾回收
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~RSASystemHelper()
+        {
+            Dispose(false);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (_privateKeyRsaProvider != null)
+                {
+                    _privateKeyRsaProvider.Dispose();
+                    _privateKeyRsaProvider = null;
+                }
+                if (_publicKeyRsaProvider != null)
+                {
+                    _publicKeyRsaProvider.Dispose();
+                    _publicKeyRsaProvider = null;
+                }
+            }
+            
+        }
+        #endregion
     }
 }

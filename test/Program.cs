@@ -25,28 +25,32 @@ namespace test
             dtUz/m5nfl9XHtGboXNzUzx/ehh8c3RgpGcig83JXOYOXafmx3OS28Ed3e2fmC5Y
             o5RD6DRHnBCid28EjQ5PgCTddNqDvcXU3YMH4sO1qNBx5MQpk92Kt/NdquIJmzhg
             pjP15MO5CFHcU90ZvQIDAQAB";
-            var rsa = new RSASystemHelper(RSAType.MD5, Encoding.UTF8, privateKey, publicKey);
-            string data = "123";
-            Console.WriteLine("(base64测试)原字符串:" + data);
-            string enText = rsa.Encrypt(data);
-            Console.WriteLine("加密:" + enText);
-            Console.WriteLine("解密:" + rsa.Decrypt(enText));
-            string sign = rsa.Sign(data);
-            Console.WriteLine("签名:" + sign);
-            Console.WriteLine("验签:" + rsa.Verify(data, sign));
+            using (var rsa = new RSASystemHelper(RSAType.MD5, Encoding.UTF8, privateKey, publicKey))
+            {
+                string data = "123";
+                Console.WriteLine("(base64测试)原字符串:" + data);
+                string enText = rsa.Encrypt(data);
+                Console.WriteLine("加密:" + enText);
+                Console.WriteLine("解密:" + rsa.Decrypt(enText));
+                string sign = rsa.Sign(data);
+                Console.WriteLine("签名:" + sign);
+                Console.WriteLine("验签:" + rsa.Verify(data, sign));
+            }
 
             string priveateKey2 = HexByte.ByteToHexStr(Convert.FromBase64String(privateKey));
             string publicKey2 = HexByte.ByteToHexStr(Convert.FromBase64String(publicKey));
-            var rsa2 = new RSASystemHelper(RSAType.MD5, Encoding.UTF8, priveateKey2, publicKey2);
-            Console.WriteLine();
-            string data2 = "456";
-            Console.WriteLine("(16进制测试)原字符串:" + data2);
-            string enText2 = rsa2.Encrypt(data2);
-            Console.WriteLine("加密:" + enText2);
-            Console.WriteLine("解密:" + rsa2.Decrypt(enText2));
-            string sign2 = rsa2.Sign(data2);
-            Console.WriteLine("签名:" + sign2);
-            Console.WriteLine("验签:" + rsa2.Verify(data2, sign2));
+            using (var rsa2 = new RSASystemHelper(RSAType.MD5, Encoding.UTF8, priveateKey2, publicKey2))
+            {
+                Console.WriteLine();
+                string data2 = "456";
+                Console.WriteLine("(16进制测试)原字符串:" + data2);
+                string enText2 = rsa2.Encrypt(data2);
+                Console.WriteLine("加密:" + enText2);
+                Console.WriteLine("解密:" + rsa2.Decrypt(enText2));
+                string sign2 = rsa2.Sign(data2);
+                Console.WriteLine("签名:" + sign2);
+                Console.WriteLine("验签:" + rsa2.Verify(data2, sign2));
+            }
 
             Console.ReadKey();
         }
