@@ -38,6 +38,7 @@ namespace test
             string priveateKey2 = HexByte.ByteToHexStr(Convert.FromBase64String(privateKey));
             string publicKey2 = HexByte.ByteToHexStr(Convert.FromBase64String(publicKey));
             var rsa2 = new RSASystemHelper(RSAType.MD5, Encoding.UTF8, priveateKey2, publicKey2);
+            Console.WriteLine();
             string data2 = "456";
             Console.WriteLine("(16进制测试)原字符串:" + data2);
             string enText2 = rsa2.Encrypt(data2);
